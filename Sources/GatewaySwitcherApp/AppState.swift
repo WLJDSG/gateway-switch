@@ -135,4 +135,18 @@ final class AppState: ObservableObject {
             }
         }
     }
+
+    func handleDeepLink(_ url: URL) {
+        guard
+            url.scheme == "gatewayswitcher",
+            url.host == "switch",
+            let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+            let profileValue = components.queryItems?.first(where: { $0.name == "profile" })?.value,
+            let profile = GatewayProfile(rawValue: profileValue)
+        else {
+            return
+        }
+
+        switchGateway(to: profile)
+    }
 }

@@ -12,6 +12,9 @@ struct GatewaySwitcherApp: App {
             ContentView()
                 .environmentObject(appState)
                 .frame(minWidth: 820, minHeight: 660)
+                .onOpenURL { url in
+                    appState.handleDeepLink(url)
+                }
         }
         .defaultSize(width: 920, height: 720)
         .commands {

@@ -1,4 +1,3 @@
-import AppIntents
 import SwiftUI
 import WidgetKit
 
@@ -43,7 +42,7 @@ struct GatewaySwitcherWidgetView: View {
     }
 
     private func gatewayButton(_ profile: WidgetGatewayProfile) -> some View {
-        Button(intent: SwitchGatewayIntent(profile: profile)) {
+        Link(destination: profile.deepLinkURL) {
             VStack(spacing: 6) {
                 Image(systemName: profile.symbolName)
                     .font(.title3)

@@ -1,2 +1,6 @@
 #idea
 /.idea
+.DS_Store
+**/.DS_Store
+/.xcode-derived/
+/dist/

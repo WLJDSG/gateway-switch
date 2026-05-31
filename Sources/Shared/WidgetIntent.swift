@@ -1,4 +1,5 @@
 import AppIntents
+import Foundation
 
 enum WidgetGatewayProfile: String, AppEnum {
     case china
@@ -37,45 +38,8 @@ enum WidgetGatewayProfile: String, AppEnum {
             return "shield.lefthalf.filled"
         }
     }
-}
 
-struct SwitchGatewayIntent: AppIntent {
-    static var title: LocalizedStringResource = "切换网关"
-    static var description = IntentDescription("切换默认网关并同步 DNS。")
-    static var openAppWhenRun = true
-
-    @Parameter(title: "网关")
-    var profile: WidgetGatewayProfile
-
-    init() {
-        profile = .china
-    }
-
-    init(profile: WidgetGatewayProfile) {
-        self.profile = profile
-    }
-
-    func perform() async throws -> some IntentResult {
-        #if canImport(GatewayKit)
-        try GatewayKit.GatewaySwitcher().switchDefaultGateway(to: profile.gatewayKitProfile)
-        return .result()
-        #else
-        return .result()
-        #endif
+    var deepLinkURL: URL {
+        URL(string: "gatewayswitcher://switch?profile=\(rawValue)")!
     }
 }
-
-#if canImport(GatewayKit)
-import GatewayKit
-
-extension WidgetGatewayProfile {
-    var gatewayKitProfile: GatewayProfile {
-        switch self {
-        case .china:
-            return .china
-        case .proxy:
-            return .proxy
-        }
-    }
-}
-#endif
