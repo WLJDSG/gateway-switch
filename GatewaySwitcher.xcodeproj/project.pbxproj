@@ -1,0 +1,129 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A00000000000000000000001 /* CommandRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000101 /* CommandRunner.swift */; };
+		A00000000000000000000002 /* GatewayModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000102 /* GatewayModels.swift */; };
+		A00000000000000000000003 /* GatewaySwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000103 /* GatewaySwitcher.swift */; };
+		A00000000000000000000004 /* NetworkInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000104 /* NetworkInspector.swift */; };
+		A00000000000000000000005 /* PasswordlessHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000105 /* PasswordlessHelper.swift */; };
+		A00000000000000000000006 /* RouteParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000106 /* RouteParser.swift */; };
+		A00000000000000000000011 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000111 /* AppState.swift */; };
+		A00000000000000000000012 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000112 /* ContentView.swift */; };
+		A00000000000000000000013 /* GatewaySwitcherApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000113 /* GatewaySwitcherApp.swift */; };
+		A00000000000000000000014 /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000114 /* MenuBarContentView.swift */; };
+		A00000000000000000000015 /* GatewayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A00000000000000000000151 /* GatewayKit.framework */; };
+		A00000000000000000000016 /* GatewayKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A00000000000000000000151 /* GatewayKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A00000000000000000000017 /* install_passwordless_helper.sh in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000117 /* install_passwordless_helper.sh */; };
+		A00000000000000000000021 /* GatewaySwitcherWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000121 /* GatewaySwitcherWidget.swift */; };
+		A00000000000000000000022 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A00000000000000000000122 /* WidgetKit.framework */; };
+		A00000000000000000000023 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A00000000000000000000123 /* SwiftUI.framework */; };
+		A00000000000000000000024 /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A00000000000000000000124 /* AppIntents.framework */; };
+		A00000000000000000000027 /* GatewaySwitcherWidgetExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A00000000000000000000152 /* GatewaySwitcherWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A00000000000000000000031 /* WidgetIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000129 /* WidgetIntent.swift */; };
+		A00000000000000000000032 /* WidgetIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000129 /* WidgetIntent.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A00000000000000000000201 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = A00000000000000000000300 /* Project object */; proxyType = 1; remoteGlobalIDString = A00000000000000000000401; remoteInfo = GatewayKit; };
+		A00000000000000000000202 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = A00000000000000000000300 /* Project object */; proxyType = 1; remoteGlobalIDString = A00000000000000000000403; remoteInfo = GatewaySwitcherWidgetExtension; };
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A00000000000000000000516 /* Embed Frameworks */ = {isa = PBXCopyFilesBuildPhase; buildActionMask = 2147483647; dstPath = ""; dstSubfolderSpec = 10; files = (A00000000000000000000016 /* GatewayKit.framework in Embed Frameworks */, ); name = "Embed Frameworks"; runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000517 /* Embed App Extensions */ = {isa = PBXCopyFilesBuildPhase; buildActionMask = 2147483647; dstPath = ""; dstSubfolderSpec = 13; files = (A00000000000000000000027 /* GatewaySwitcherWidgetExtension.appex in Embed App Extensions */, ); name = "Embed App Extensions"; runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		A00000000000000000000101 /* CommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandRunner.swift; sourceTree = "<group>"; };
+		A00000000000000000000102 /* GatewayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewayModels.swift; sourceTree = "<group>"; };
+		A00000000000000000000103 /* GatewaySwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewaySwitcher.swift; sourceTree = "<group>"; };
+		A00000000000000000000104 /* NetworkInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInspector.swift; sourceTree = "<group>"; };
+		A00000000000000000000105 /* PasswordlessHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordlessHelper.swift; sourceTree = "<group>"; };
+		A00000000000000000000106 /* RouteParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteParser.swift; sourceTree = "<group>"; };
+		A00000000000000000000111 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		A00000000000000000000112 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A00000000000000000000113 /* GatewaySwitcherApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewaySwitcherApp.swift; sourceTree = "<group>"; };
+		A00000000000000000000114 /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
+		A00000000000000000000117 /* install_passwordless_helper.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = install_passwordless_helper.sh; path = script/install_passwordless_helper.sh; sourceTree = SOURCE_ROOT; };
+		A00000000000000000000118 /* App Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A00000000000000000000121 /* GatewaySwitcherWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GatewaySwitcherWidget.swift; sourceTree = "<group>"; };
+		A00000000000000000000122 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		A00000000000000000000123 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		A00000000000000000000124 /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = System/Library/Frameworks/AppIntents.framework; sourceTree = SDKROOT; };
+		A00000000000000000000128 /* Widget Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A00000000000000000000129 /* WidgetIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetIntent.swift; sourceTree = "<group>"; };
+		A00000000000000000000150 /* GatewaySwitcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GatewaySwitcher.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000151 /* GatewayKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = GatewayKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000152 /* GatewaySwitcherWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = GatewaySwitcherWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A00000000000000000000512 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000015 /* GatewayKit.framework in Frameworks */, ); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000522 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000022 /* WidgetKit.framework in Frameworks */, A00000000000000000000023 /* SwiftUI.framework in Frameworks */, A00000000000000000000024 /* AppIntents.framework in Frameworks */, ); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000532 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A00000000000000000000600 = {isa = PBXGroup; children = (A00000000000000000000601 /* Sources */, A00000000000000000000605 /* AppResources */, A00000000000000000000606 /* WidgetResources */, A00000000000000000000607 /* Frameworks */, A00000000000000000000608 /* Products */, ); sourceTree = "<group>"; };
+		A00000000000000000000601 /* Sources */ = {isa = PBXGroup; children = (A00000000000000000000602 /* GatewayKit */, A00000000000000000000603 /* GatewaySwitcherApp */, A00000000000000000000604 /* GatewaySwitcherWidget */, A00000000000000000000609 /* Shared */, A00000000000000000000117 /* install_passwordless_helper.sh */, ); path = Sources; sourceTree = "<group>"; };
+		A00000000000000000000602 /* GatewayKit */ = {isa = PBXGroup; children = (A00000000000000000000101, A00000000000000000000102, A00000000000000000000103, A00000000000000000000104, A00000000000000000000105, A00000000000000000000106, ); path = GatewayKit; sourceTree = "<group>"; };
+		A00000000000000000000603 /* GatewaySwitcherApp */ = {isa = PBXGroup; children = (A00000000000000000000111, A00000000000000000000112, A00000000000000000000113, A00000000000000000000114, ); path = GatewaySwitcherApp; sourceTree = "<group>"; };
+		A00000000000000000000604 /* GatewaySwitcherWidget */ = {isa = PBXGroup; children = (A00000000000000000000121, ); path = GatewaySwitcherWidget; sourceTree = "<group>"; };
+		A00000000000000000000609 /* Shared */ = {isa = PBXGroup; children = (A00000000000000000000129, ); path = Shared; sourceTree = "<group>"; };
+		A00000000000000000000605 /* AppResources */ = {isa = PBXGroup; children = (A00000000000000000000118 /* App Info.plist */, ); path = AppResources; sourceTree = "<group>"; };
+		A00000000000000000000606 /* WidgetResources */ = {isa = PBXGroup; children = (A00000000000000000000128 /* Widget Info.plist */, ); path = WidgetResources; sourceTree = "<group>"; };
+		A00000000000000000000607 /* Frameworks */ = {isa = PBXGroup; children = (A00000000000000000000122, A00000000000000000000123, A00000000000000000000124, ); name = Frameworks; sourceTree = "<group>"; };
+		A00000000000000000000608 /* Products */ = {isa = PBXGroup; children = (A00000000000000000000150, A00000000000000000000151, A00000000000000000000152, ); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A00000000000000000000401 /* GatewayKit */ = {isa = PBXNativeTarget; buildConfigurationList = A00000000000000000000710 /* Build configuration list for PBXNativeTarget "GatewayKit" */; buildPhases = (A00000000000000000000531 /* Sources */, A00000000000000000000532 /* Frameworks */, ); buildRules = (); dependencies = (); name = GatewayKit; productName = GatewayKit; productReference = A00000000000000000000151 /* GatewayKit.framework */; productType = "com.apple.product-type.framework"; };
+		A00000000000000000000402 /* GatewaySwitcher */ = {isa = PBXNativeTarget; buildConfigurationList = A00000000000000000000720 /* Build configuration list for PBXNativeTarget "GatewaySwitcher" */; buildPhases = (A00000000000000000000511 /* Sources */, A00000000000000000000512 /* Frameworks */, A00000000000000000000513 /* Resources */, A00000000000000000000516 /* Embed Frameworks */, A00000000000000000000517 /* Embed App Extensions */, ); buildRules = (); dependencies = (A00000000000000000000211 /* PBXTargetDependency */, A00000000000000000000212 /* PBXTargetDependency */, ); name = GatewaySwitcher; productName = GatewaySwitcher; productReference = A00000000000000000000150 /* GatewaySwitcher.app */; productType = "com.apple.product-type.application"; };
+		A00000000000000000000403 /* GatewaySwitcherWidgetExtension */ = {isa = PBXNativeTarget; buildConfigurationList = A00000000000000000000730 /* Build configuration list for PBXNativeTarget "GatewaySwitcherWidgetExtension" */; buildPhases = (A00000000000000000000521 /* Sources */, A00000000000000000000522 /* Frameworks */, ); buildRules = (); dependencies = (); name = GatewaySwitcherWidgetExtension; productName = GatewaySwitcherWidgetExtension; productReference = A00000000000000000000152 /* GatewaySwitcherWidgetExtension.appex */; productType = "com.apple.product-type.app-extension"; };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000000000000000000300 /* Project object */ = {isa = PBXProject; attributes = {BuildIndependentTargetsInParallel = 1; LastSwiftUpdateCheck = 1600; LastUpgradeCheck = 1600; TargetAttributes = {A00000000000000000000401 = {CreatedOnToolsVersion = 16.0; }; A00000000000000000000402 = {CreatedOnToolsVersion = 16.0; }; A00000000000000000000403 = {CreatedOnToolsVersion = 16.0; }; }; }; buildConfigurationList = A00000000000000000000700 /* Build configuration list for PBXProject "GatewaySwitcher" */; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base, ); mainGroup = A00000000000000000000600; productRefGroup = A00000000000000000000608 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (A00000000000000000000402 /* GatewaySwitcher */, A00000000000000000000403 /* GatewaySwitcherWidgetExtension */, A00000000000000000000401 /* GatewayKit */, ); };
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A00000000000000000000513 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000017 /* install_passwordless_helper.sh in Resources */, ); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A00000000000000000000511 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000011, A00000000000000000000012, A00000000000000000000013, A00000000000000000000014, A00000000000000000000031, ); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000521 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000021, A00000000000000000000032, ); runOnlyForDeploymentPostprocessing = 0; };
+		A00000000000000000000531 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005, A00000000000000000000006, ); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A00000000000000000000211 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = A00000000000000000000401 /* GatewayKit */; targetProxy = A00000000000000000000201 /* PBXContainerItemProxy */; };
+		A00000000000000000000212 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = A00000000000000000000403 /* GatewaySwitcherWidgetExtension */; targetProxy = A00000000000000000000202 /* PBXContainerItemProxy */; };
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A00000000000000000000801 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; CODE_SIGN_IDENTITY = "-"; CODE_SIGN_STYLE = Manual; DEVELOPMENT_TEAM = ""; ENABLE_USER_SCRIPT_SANDBOXING = NO; MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; SWIFT_VERSION = 5.0; }; name = Debug; };
+		A00000000000000000000802 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; CODE_SIGN_IDENTITY = "-"; CODE_SIGN_STYLE = Manual; DEVELOPMENT_TEAM = ""; ENABLE_USER_SCRIPT_SANDBOXING = NO; MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx; SWIFT_VERSION = 5.0; }; name = Release; };
+		A00000000000000000000811 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_IDENTITY = "-"; CODE_SIGN_STYLE = Manual; DEFINES_MODULE = YES; DYLIB_COMPATIBILITY_VERSION = 1; DYLIB_CURRENT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleName = GatewayKit; INSTALL_PATH = "@rpath"; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks"; MACOSX_DEPLOYMENT_TARGET = 14.0; PRODUCT_BUNDLE_IDENTIFIER = com.wenlanjun.GatewayKit; PRODUCT_NAME = "$(TARGET_NAME)"; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0; }; name = Debug; };
+		A00000000000000000000812 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_IDENTITY = "-"; CODE_SIGN_STYLE = Manual; DEFINES_MODULE = YES; DYLIB_COMPATIBILITY_VERSION = 1; DYLIB_CURRENT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleName = GatewayKit; INSTALL_PATH = "@rpath"; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks"; MACOSX_DEPLOYMENT_TARGET = 14.0; PRODUCT_BUNDLE_IDENTIFIER = com.wenlanjun.GatewayKit; PRODUCT_NAME = "$(TARGET_NAME)"; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0; }; name = Release; };
+		A00000000000000000000821 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_IDENTITY = "-"; CODE_SIGN_STYLE = Manual; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = AppResources/Info.plist; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks"; MACOSX_DEPLOYMENT_TARGET = 14.0; PRODUCT_BUNDLE_IDENTIFIER = com.wenlanjun.GatewaySwitcher; PRODUCT_NAME = GatewaySwitcher; SWIFT_VERSION = 5.0; }; name = Debug; };
+		A00000000000000000000822 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_IDENTITY = "-"; CODE_SIGN_STYLE = Manual; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = AppResources/Info.plist; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks"; MACOSX_DEPLOYMENT_TARGET = 14.0; PRODUCT_BUNDLE_IDENTIFIER = com.wenlanjun.GatewaySwitcher; PRODUCT_NAME = GatewaySwitcher; SWIFT_VERSION = 5.0; }; name = Release; };
+		A00000000000000000000831 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_IDENTITY = "-"; CODE_SIGN_STYLE = Manual; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = WidgetResources/Info.plist; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks"; MACOSX_DEPLOYMENT_TARGET = 14.0; PRODUCT_BUNDLE_IDENTIFIER = com.wenlanjun.GatewaySwitcher.Widget; PRODUCT_NAME = GatewaySwitcherWidgetExtension; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0; }; name = Debug; };
+		A00000000000000000000832 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_IDENTITY = "-"; CODE_SIGN_STYLE = Manual; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = WidgetResources/Info.plist; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks"; MACOSX_DEPLOYMENT_TARGET = 14.0; PRODUCT_BUNDLE_IDENTIFIER = com.wenlanjun.GatewaySwitcher.Widget; PRODUCT_NAME = GatewaySwitcherWidgetExtension; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0; }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A00000000000000000000700 /* Build configuration list for PBXProject "GatewaySwitcher" */ = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000801 /* Debug */, A00000000000000000000802 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
+		A00000000000000000000710 /* Build configuration list for PBXNativeTarget "GatewayKit" */ = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000811 /* Debug */, A00000000000000000000812 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
+		A00000000000000000000720 /* Build configuration list for PBXNativeTarget "GatewaySwitcher" */ = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000821 /* Debug */, A00000000000000000000822 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
+		A00000000000000000000730 /* Build configuration list for PBXNativeTarget "GatewaySwitcherWidgetExtension" */ = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000831 /* Debug */, A00000000000000000000832 /* Release */, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
+/* End XCConfigurationList section */
+	};
+	rootObject = A00000000000000000000300 /* Project object */;
+}
