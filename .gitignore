@@ -1,6 +1,19 @@
-#idea
+# IDE
 /.idea
+
+# macOS
 .DS_Store
 **/.DS_Store
+
+# Swift Package Manager
+/.swiftpm/
+
+# Xcode derived data
 /.xcode-derived/
+
+# Xcode user-specific data
+xcuserdata/
+*.xcuserstate
+
+# Build output
 /dist/
