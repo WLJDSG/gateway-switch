@@ -8,12 +8,9 @@
 # Swift Package Manager
 /.swiftpm/
 /.build/
-/.codegraph/
 
-# Xcode derived data
-/.xcode-derived/
-
-# Xcode user-specific data
+# Xcode
+*.xcodeproj/
 xcuserdata/
 *.xcuserstate
 

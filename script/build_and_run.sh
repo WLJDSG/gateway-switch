@@ -3,6 +3,7 @@ set -euo pipefail
 
 MODE="${1:-run}"
 APP_NAME="GatewaySwitcher"
+WIDGET_NAME="GatewaySwitcherWidgetExtension"
 BUNDLE_ID="com.wenlanjun.GatewaySwitcher"
 MIN_SYSTEM_VERSION="13.0"
 INSTALL_APP_BUNDLE="/Applications/$APP_NAME.app"
@@ -10,9 +11,6 @@ INSTALL_APP_BUNDLE="/Applications/$APP_NAME.app"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
 APP_BUNDLE="$DIST_DIR/$APP_NAME.app"
-XCODE_PROJECT="$ROOT_DIR/GatewaySwitcher.xcodeproj"
-XCODE_DERIVED_DATA="$ROOT_DIR/.xcode-derived"
-XCODE_APP_BUNDLE="$XCODE_DERIVED_DATA/Build/Products/Debug/$APP_NAME.app"
 LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Versions/Current/Frameworks/LaunchServices.framework/Versions/Current/Support/lsregister"
 APP_CONTENTS="$APP_BUNDLE/Contents"
 APP_MACOS="$APP_CONTENTS/MacOS"
@@ -24,48 +22,44 @@ cd "$ROOT_DIR"
 
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
-if [[ -d "$XCODE_PROJECT" ]] && command -v xcodebuild >/dev/null 2>&1; then
-  XCODEBUILD_ARGS=(
-    -project "$XCODE_PROJECT"
-    -scheme "$APP_NAME"
-    -configuration Debug
-    -derivedDataPath "$XCODE_DERIVED_DATA"
-    build
-  )
+if ! swift build; then
+  echo "SwiftPM build failed" >&2
+  exit 1
+fi
 
-  if [[ -n "${DEVELOPMENT_TEAM:-}" ]]; then
-    XCODEBUILD_ARGS+=(
-      -allowProvisioningUpdates
-      CODE_SIGN_STYLE=Automatic
-      DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM"
-      CODE_SIGN_IDENTITY="Apple Development"
-    )
+BUILD_DIR="$(swift build --show-bin-path)"
+
+rm -rf "$APP_BUNDLE"
+mkdir -p "$APP_MACOS" "$APP_RESOURCES"
+
+cp "$BUILD_DIR/$APP_NAME" "$APP_BINARY"
+chmod +x "$APP_BINARY"
+
+# Bundle assets
+if [[ -d "Sources/GatewaySwitcherApp/Resources/Assets.xcassets" ]]; then
+  cp -R Sources/GatewaySwitcherApp/Resources/Assets.xcassets "$APP_RESOURCES/Assets.xcassets"
+fi
+
+cp "$ROOT_DIR/script/install_passwordless_helper.sh" "$APP_RESOURCES/install_passwordless_helper.sh"
+chmod +x "$APP_RESOURCES/install_passwordless_helper.sh"
+
+# Bundle widget extension if built
+WIDGET_BINARY="$BUILD_DIR/$WIDGET_NAME"
+if [[ -x "$WIDGET_BINARY" ]]; then
+  WIDGET_PLUGINS="$APP_CONTENTS/PlugIns"
+  WIDGET_APPEX="$WIDGET_PLUGINS/$WIDGET_NAME.appex"
+  mkdir -p "$WIDGET_PLUGINS/$WIDGET_NAME.appex/Contents/MacOS"
+  mkdir -p "$WIDGET_PLUGINS/$WIDGET_NAME.appex/Contents/Resources"
+  cp "$WIDGET_BINARY" "$WIDGET_PLUGINS/$WIDGET_NAME.appex/Contents/MacOS/$WIDGET_NAME"
+  chmod +x "$WIDGET_PLUGINS/$WIDGET_NAME.appex/Contents/MacOS/$WIDGET_NAME"
+
+  if [[ -f "Config/Widget/Info.plist" ]]; then
+    cp Config/Widget/Info.plist "$WIDGET_APPEX/Contents/Info.plist"
   fi
+fi
 
-  xcodebuild "${XCODEBUILD_ARGS[@]}"
-  rm -rf "$APP_BUNDLE"
-  mkdir -p "$DIST_DIR"
-  /usr/bin/ditto "$XCODE_APP_BUNDLE" "$APP_BUNDLE"
-  APP_BINARY="$APP_BUNDLE/Contents/MacOS/$APP_NAME"
-else
-  if swift build; then
-    BUILD_BINARY="$(swift build --show-bin-path)/$APP_NAME"
-  else
-    echo "SwiftPM build failed; falling back to direct swiftc build." >&2
-    MANUAL_BUILD_DIR="$ROOT_DIR/.build/manual"
-    mkdir -p "$MANUAL_BUILD_DIR"
-    swiftc Sources/GatewayKit/*.swift Sources/GatewaySwitcherApp/*.swift -o "$MANUAL_BUILD_DIR/$APP_NAME"
-    BUILD_BINARY="$MANUAL_BUILD_DIR/$APP_NAME"
-  fi
-
-  rm -rf "$APP_BUNDLE"
-  mkdir -p "$APP_MACOS" "$APP_RESOURCES"
-  cp "$BUILD_BINARY" "$APP_BINARY"
-  chmod +x "$APP_BINARY"
-  cp "$ROOT_DIR/script/install_passwordless_helper.sh" "$APP_RESOURCES/install_passwordless_helper.sh"
-  chmod +x "$APP_RESOURCES/install_passwordless_helper.sh"
-
-  cat >"$INFO_PLIST" <<PLIST
+# Generate app Info.plist
+cat >"$INFO_PLIST" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -84,22 +78,32 @@ else
   <string>$MIN_SYSTEM_VERSION</string>
   <key>NSPrincipalClass</key>
   <string>NSApplication</string>
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLName</key>
+      <string>$BUNDLE_ID</string>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>gatewayswitcher</string>
+      </array>
+    </dict>
+  </array>
 </dict>
 </plist>
 PLIST
-fi
 
 register_app_bundle() {
   [[ -x "$LSREGISTER" ]] && "$LSREGISTER" -f -R -trusted "$APP_BUNDLE" >/dev/null 2>&1 || true
 
-  local widget_extension="$APP_BUNDLE/Contents/PlugIns/GatewaySwitcherWidgetExtension.appex"
+  local widget_extension="$APP_BUNDLE/Contents/PlugIns/$WIDGET_NAME.appex"
   if [[ -d "$widget_extension" ]] && command -v pluginkit >/dev/null 2>&1; then
     pluginkit -a "$widget_extension" >/dev/null 2>&1 || true
   fi
 }
 
 warn_unsigned_widget() {
-  local widget_extension="$APP_BUNDLE/Contents/PlugIns/GatewaySwitcherWidgetExtension.appex"
+  local widget_extension="$APP_BUNDLE/Contents/PlugIns/$WIDGET_NAME.appex"
   [[ -d "$widget_extension" ]] || return
 
   local signing_info

@@ -1,20 +1,20 @@
 import AppIntents
 import Foundation
 
-enum WidgetGatewayProfile: String, AppEnum, CaseIterable {
+public enum WidgetGatewayProfile: String, AppEnum, CaseIterable {
     case china
     case dotTwo
     case proxy
 
-    static var typeDisplayRepresentation = TypeDisplayRepresentation(name: "网关")
+    public static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "网关")
 
-    static var caseDisplayRepresentations: [WidgetGatewayProfile: DisplayRepresentation] = [
+    public static let caseDisplayRepresentations: [WidgetGatewayProfile: DisplayRepresentation] = [
         .china: DisplayRepresentation(title: "国内网关", subtitle: "192.168.31.1"),
         .dotTwo: DisplayRepresentation(title: ".2 网关", subtitle: "192.168.31.2"),
         .proxy: DisplayRepresentation(title: "代理网关", subtitle: "192.168.31.3")
     ]
 
-    var title: String {
+    public var title: String {
         switch self {
         case .china:
             return "国内"
@@ -25,7 +25,7 @@ enum WidgetGatewayProfile: String, AppEnum, CaseIterable {
         }
     }
 
-    var gateway: String {
+    public var gateway: String {
         switch self {
         case .china:
             return "192.168.31.1"
@@ -36,7 +36,7 @@ enum WidgetGatewayProfile: String, AppEnum, CaseIterable {
         }
     }
 
-    var symbolName: String {
+    public var symbolName: String {
         switch self {
         case .china:
             return "router"
@@ -47,7 +47,7 @@ enum WidgetGatewayProfile: String, AppEnum, CaseIterable {
         }
     }
 
-    var deepLinkURL: URL {
+    public var deepLinkURL: URL {
         URL(string: "gatewayswitcher://switch?profile=\(rawValue)")!
     }
 }

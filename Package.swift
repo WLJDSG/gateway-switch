@@ -5,17 +5,26 @@ import PackageDescription
 let package = Package(
     name: "GatewaySwitcher",
     platforms: [
-        .macOS(.v13)
+        .macOS(.v14)
     ],
     products: [
         .library(name: "GatewayKit", targets: ["GatewayKit"]),
-        .executable(name: "GatewaySwitcher", targets: ["GatewaySwitcherApp"])
+        .executable(name: "GatewaySwitcher", targets: ["GatewaySwitcherApp"]),
+        .executable(name: "GatewaySwitcherWidgetExtension", targets: ["GatewaySwitcherWidget"])
     ],
     targets: [
         .target(name: "GatewayKit"),
+        .target(name: "SharedKit"),
         .executableTarget(
             name: "GatewaySwitcherApp",
-            dependencies: ["GatewayKit"]
+            dependencies: ["GatewayKit"],
+            resources: [
+                .process("Resources")
+            ]
+        ),
+        .executableTarget(
+            name: "GatewaySwitcherWidget",
+            dependencies: ["SharedKit"]
         ),
         .testTarget(
             name: "GatewayKitTests",
