@@ -19,7 +19,7 @@ let package = Package(
         ),
         .testTarget(
             name: "GatewayKitTests",
-            dependencies: ["GatewayKit"]
+            dependencies: ["GatewayKit", "GatewaySwitcherApp"]
         )
     ]
 )

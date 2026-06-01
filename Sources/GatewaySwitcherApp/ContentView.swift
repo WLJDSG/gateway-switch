@@ -42,13 +42,13 @@ private struct HeaderView: View {
             Image(systemName: appState.activeProfile?.symbolName ?? "network")
                 .font(.system(size: 38, weight: .semibold))
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(appState.activeProfile == .proxy ? .blue : .green)
+                .foregroundStyle(appState.activeProfile?.accentColor ?? .green)
                 .frame(width: 56, height: 56)
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("网关切换器")
                     .font(.system(size: 28, weight: .bold))
-                Text("当前使用 \(appState.displayGateway ?? "检测中")，可在国内网关和代理网关之间快速切换。")
+                Text("当前使用 \(appState.displayGateway ?? "检测中")，可在 .1、.2 和 .3 网关之间快速切换。")
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
@@ -67,9 +67,12 @@ private struct HeaderView: View {
 
 private struct GatewayProfilePicker: View {
     @EnvironmentObject private var appState: AppState
+    private let columns = [
+        GridItem(.adaptive(minimum: 230), spacing: 14)
+    ]
 
     var body: some View {
-        HStack(spacing: 14) {
+        LazyVGrid(columns: columns, alignment: .leading, spacing: 14) {
             ForEach(GatewayProfile.allCases) { profile in
                 GatewayProfileCard(profile: profile)
             }
@@ -101,7 +104,7 @@ private struct GatewayProfileCard: View {
             Text(profile.gateway)
                 .font(.system(.title2, design: .monospaced, weight: .semibold))
 
-            Text(profile == .china ? "适合直连国内网络、低延迟访问本地服务。" : "适合将默认出口交给旁路由代理。")
+            Text(profile.description)
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -169,7 +172,7 @@ private struct PasswordlessHelperBanner: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(appState.isPasswordlessEnabled ? "免密切换已启用" : "可安装免密切换")
                     .font(.headline)
-                Text(appState.isPasswordlessEnabled ? "后续切换会走受限 helper，不再反复要求管理员密码。" : "首次安装需要管理员密码；之后只允许免密切换 192.168.31.1 / 192.168.31.3。")
+                Text(appState.isPasswordlessEnabled ? "后续切换会走受限 helper，不再反复要求管理员密码。" : "首次安装需要管理员密码；之后只允许免密切换 192.168.31.1 / 192.168.31.2 / 192.168.31.3。")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -274,5 +277,18 @@ private struct FooterView: View {
             Spacer()
         }
         .font(.callout)
+    }
+}
+
+private extension GatewayProfile {
+    var accentColor: Color {
+        switch self {
+        case .china:
+            return .green
+        case .dotTwo:
+            return .orange
+        case .proxy:
+            return .blue
+        }
     }
 }

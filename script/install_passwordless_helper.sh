@@ -75,17 +75,17 @@ if [[ -z "$SERVICE" || -z "$IP" || -z "$SUBNET" || -z "$ROUTER" || -z "$DNS" ]];
   exit 2
 fi
 
-if [[ "$ROUTER" != "192.168.31.1" && "$ROUTER" != "192.168.31.3" ]]; then
+if [[ "$ROUTER" != "192.168.31.1" && "$ROUTER" != "192.168.31.2" && "$ROUTER" != "192.168.31.3" ]]; then
   echo "Router is not allowed: $ROUTER" >&2
   exit 2
 fi
 
-if [[ "$DNS" != "192.168.31.1" && "$DNS" != "192.168.31.3" ]]; then
+if [[ "$DNS" != "192.168.31.1" && "$DNS" != "192.168.31.2" && "$DNS" != "192.168.31.3" ]]; then
   echo "DNS is not allowed: $DNS" >&2
   exit 2
 fi
 
-if [[ "$SERVICE" == *"/"* || "$SERVICE" == *$'\n'* || "$SERVICE" == *$'\r'* ]]; then
+if [[ "$SERVICE" == *$'\n'* || "$SERVICE" == *$'\r'* ]]; then
   echo "Service name is not allowed." >&2
   exit 2
 fi

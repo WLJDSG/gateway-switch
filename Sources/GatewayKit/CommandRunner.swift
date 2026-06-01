@@ -1,11 +1,11 @@
 import Foundation
 
-public protocol CommandRunning {
+public protocol CommandRunning: Sendable {
     func run(_ executable: String, arguments: [String]) throws -> CommandResult
 }
 
 @available(macOSApplicationExtension, unavailable)
-public struct ProcessCommandRunner: CommandRunning {
+public struct ProcessCommandRunner: CommandRunning, Sendable {
     public init() {}
 
     public func run(_ executable: String, arguments: [String]) throws -> CommandResult {

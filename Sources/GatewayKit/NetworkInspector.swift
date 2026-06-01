@@ -1,7 +1,7 @@
 import Darwin
 import Foundation
 
-public struct NetworkInspector {
+public struct NetworkInspector: Sendable {
     private let runner: CommandRunning
 
     public init(runner: CommandRunning = ProcessCommandRunner()) {

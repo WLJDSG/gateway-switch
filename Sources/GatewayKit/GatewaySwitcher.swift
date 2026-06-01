@@ -1,6 +1,6 @@
 import Foundation
 
-public struct GatewaySwitcher {
+public struct GatewaySwitcher: Sendable {
     private let runner: CommandRunning
 
     public init(runner: CommandRunning = ProcessCommandRunner()) {
@@ -72,7 +72,10 @@ public struct GatewaySwitcher {
         if combinedOutput.contains("a password is required")
             || combinedOutput.contains("no tty present")
             || combinedOutput.contains("command not found")
-            || combinedOutput.contains("No such file") {
+            || combinedOutput.contains("No such file")
+            || combinedOutput.contains("Router is not allowed")
+            || combinedOutput.contains("DNS is not allowed")
+            || combinedOutput.contains("Service name is not allowed") {
             return false
         }
 

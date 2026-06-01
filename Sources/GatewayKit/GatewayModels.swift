@@ -1,7 +1,8 @@
 import Foundation
 
-public enum GatewayProfile: String, CaseIterable, Identifiable, Equatable {
+public enum GatewayProfile: String, CaseIterable, Identifiable, Equatable, Sendable {
     case china
+    case dotTwo
     case proxy
 
     public var id: String { rawValue }
@@ -10,6 +11,8 @@ public enum GatewayProfile: String, CaseIterable, Identifiable, Equatable {
         switch self {
         case .china:
             return "国内网关"
+        case .dotTwo:
+            return ".2 网关"
         case .proxy:
             return "代理网关"
         }
@@ -19,6 +22,8 @@ public enum GatewayProfile: String, CaseIterable, Identifiable, Equatable {
         switch self {
         case .china:
             return "192.168.31.1"
+        case .dotTwo:
+            return "192.168.31.2"
         case .proxy:
             return "192.168.31.3"
         }
@@ -28,12 +33,25 @@ public enum GatewayProfile: String, CaseIterable, Identifiable, Equatable {
         [gateway]
     }
 
+    public var description: String {
+        switch self {
+        case .china:
+            return "适合直连国内网络、低延迟访问本地服务。"
+        case .dotTwo:
+            return "适合切换到 .2 网关，作为备用出口或中间路由。"
+        case .proxy:
+            return "适合将默认出口交给旁路由代理。"
+        }
+    }
+
     public var symbolName: String {
         switch self {
         case .china:
-            return "house.and.flag"
+            return "router"
+        case .dotTwo:
+            return "point.3.connected.trianglepath.dotted"
         case .proxy:
-            return "shield.lefthalf.filled"
+            return "network.badge.shield.half.filled"
         }
     }
 
@@ -43,7 +61,7 @@ public enum GatewayProfile: String, CaseIterable, Identifiable, Equatable {
     }
 }
 
-public struct NetworkSnapshot: Equatable {
+public struct NetworkSnapshot: Equatable, Sendable {
     public var gateway: String?
     public var interfaceName: String?
     public var serviceName: String?
@@ -75,7 +93,7 @@ public struct NetworkSnapshot: Equatable {
     }
 }
 
-public struct CommandResult: Equatable {
+public struct CommandResult: Equatable, Sendable {
     public var standardOutput: String
     public var standardError: String
     public var terminationStatus: Int32
@@ -87,7 +105,7 @@ public struct CommandResult: Equatable {
     }
 }
 
-public enum GatewayError: LocalizedError, Equatable {
+public enum GatewayError: LocalizedError, Equatable, Sendable {
     case commandFailed(String)
     case invalidGateway(String)
     case missingNetworkConfiguration

@@ -29,8 +29,9 @@ struct GatewaySwitcherWidgetView: View {
                 .font(.headline)
 
             HStack(spacing: 8) {
-                gatewayButton(.china)
-                gatewayButton(.proxy)
+                ForEach(WidgetGatewayProfile.allCases, id: \.rawValue) { profile in
+                    gatewayButton(profile)
+                }
             }
 
             Text("需先在主 App 安装免密 helper")
@@ -49,10 +50,10 @@ struct GatewaySwitcherWidgetView: View {
                 Text(profile.title)
                     .font(.caption.weight(.semibold))
                 Text(profile.gateway)
-                    .font(.system(size: 10, design: .monospaced))
+                    .font(.system(size: 9, design: .monospaced))
                     .foregroundStyle(.secondary)
             }
-            .frame(maxWidth: .infinity, minHeight: 78)
+            .frame(maxWidth: .infinity, minHeight: 74)
         }
         .buttonStyle(.bordered)
     }
@@ -66,7 +67,7 @@ struct GatewaySwitcherWidget: Widget {
             GatewaySwitcherWidgetView(entry: entry)
         }
         .configurationDisplayName("切换网关")
-        .description("从桌面小组件切换 192.168.31.1 / 192.168.31.3。")
+        .description("从桌面小组件切换 192.168.31.1 / 192.168.31.2 / 192.168.31.3。")
         .supportedFamilies([.systemSmall])
     }
 }

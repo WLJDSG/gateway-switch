@@ -19,22 +19,44 @@ final class AppState: ObservableObject {
     @Published private(set) var isPasswordlessEnabled = false
     @Published var statusMessage: String?
 
-    private let inspector = NetworkInspector()
-    private let switcher = GatewaySwitcher()
+    private let snapshotProvider: @Sendable () -> NetworkSnapshot
+    private let passwordlessStatusProvider: @Sendable () -> Bool
+    private let gatewaySwitchAction: @Sendable (GatewayProfile, NetworkSnapshot) throws -> Void
+    private let helperInstallAction: @Sendable (String) throws -> Void
     private var timer: Timer?
 
-    init() {
+    init(
+        snapshotProvider: @escaping @Sendable () -> NetworkSnapshot = { NetworkInspector().snapshot() },
+        passwordlessStatusProvider: @escaping @Sendable () -> Bool = { PasswordlessHelper.isInstalled() },
+        gatewaySwitchAction: @escaping @Sendable (GatewayProfile, NetworkSnapshot) throws -> Void = { profile, snapshot in
+            try GatewaySwitcher().switchDefaultGateway(to: profile, snapshot: snapshot)
+        },
+        helperInstallAction: @escaping @Sendable (String) throws -> Void = { installerPath in
+            try PasswordlessHelper.install(installerPath: installerPath)
+        },
+        startsTimer: Bool = true
+    ) {
+        self.snapshotProvider = snapshotProvider
+        self.passwordlessStatusProvider = passwordlessStatusProvider
+        self.gatewaySwitchAction = gatewaySwitchAction
+        self.helperInstallAction = helperInstallAction
+
         refresh()
         refreshPasswordlessStatus()
-        timer = Timer.scheduledTimer(withTimeInterval: 8, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.refresh()
+
+        if startsTimer {
+            timer = Timer.scheduledTimer(withTimeInterval: 8, repeats: true) { [weak self] _ in
+                Task { @MainActor in
+                    self?.refresh()
+                }
             }
         }
     }
 
     deinit {
-        timer?.invalidate()
+        MainActor.assumeIsolated {
+            timer?.invalidate()
+        }
     }
 
     var activeProfile: GatewayProfile? {
@@ -57,9 +79,9 @@ final class AppState: ObservableObject {
         guard !isRefreshing, !isSwitching else { return }
         isRefreshing = true
 
-        Task.detached(priority: .userInitiated) { [inspector] in
-            let nextSnapshot = inspector.snapshot()
-            let helperInstalled = PasswordlessHelper.isInstalled()
+        Task.detached(priority: .userInitiated) { [snapshotProvider, passwordlessStatusProvider] in
+            let nextSnapshot = snapshotProvider()
+            let helperInstalled = passwordlessStatusProvider()
             await MainActor.run {
                 self.snapshot = nextSnapshot
                 self.isPasswordlessEnabled = helperInstalled
@@ -69,8 +91,8 @@ final class AppState: ObservableObject {
     }
 
     func refreshPasswordlessStatus() {
-        Task.detached(priority: .utility) {
-            let helperInstalled = PasswordlessHelper.isInstalled()
+        Task.detached(priority: .utility) { [passwordlessStatusProvider] in
+            let helperInstalled = passwordlessStatusProvider()
             await MainActor.run {
                 self.isPasswordlessEnabled = helperInstalled
             }
@@ -87,10 +109,10 @@ final class AppState: ObservableObject {
         isInstallingHelper = true
         statusMessage = "正在安装免密切换 helper..."
 
-        Task.detached(priority: .userInitiated) {
+        Task.detached(priority: .userInitiated) { [helperInstallAction, passwordlessStatusProvider] in
             do {
-                try PasswordlessHelper.install(installerPath: installerPath)
-                let helperInstalled = PasswordlessHelper.isInstalled()
+                try helperInstallAction(installerPath)
+                let helperInstalled = passwordlessStatusProvider()
                 await MainActor.run {
                     self.isPasswordlessEnabled = helperInstalled
                     self.isInstallingHelper = false
@@ -112,12 +134,12 @@ final class AppState: ObservableObject {
         switchingProfile = profile
         statusMessage = "正在切换到 \(profile.gateway)，并同步 DNS..."
 
-        let currentSnapshot = snapshot
-        Task.detached(priority: .userInitiated) { [switcher, currentSnapshot] in
+        Task.detached(priority: .userInitiated) { [snapshotProvider, passwordlessStatusProvider, gatewaySwitchAction, profile] in
             do {
-                try switcher.switchDefaultGateway(to: profile, snapshot: currentSnapshot)
-                let nextSnapshot = NetworkInspector().snapshot()
-                let helperInstalled = PasswordlessHelper.isInstalled()
+                let currentSnapshot = snapshotProvider()
+                try gatewaySwitchAction(profile, currentSnapshot)
+                let nextSnapshot = snapshotProvider()
+                let helperInstalled = passwordlessStatusProvider()
                 await MainActor.run {
                     self.snapshot = nextSnapshot
                     self.isPasswordlessEnabled = helperInstalled
