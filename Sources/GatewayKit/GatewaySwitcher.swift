@@ -1,4 +1,5 @@
 import Foundation
+import SharedKit
 
 public struct GatewaySwitcher: Sendable {
     private let runner: CommandRunning

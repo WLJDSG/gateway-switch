@@ -4,19 +4,22 @@ import SharedKit
 
 struct GatewaySwitcherWidgetEntry: TimelineEntry {
     let date: Date
+    let profiles: [GatewayProfile]
 }
 
 struct GatewaySwitcherTimelineProvider: TimelineProvider {
     func placeholder(in context: Context) -> GatewaySwitcherWidgetEntry {
-        GatewaySwitcherWidgetEntry(date: Date())
+        GatewaySwitcherWidgetEntry(date: Date(), profiles: GatewayProfile.defaults)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (GatewaySwitcherWidgetEntry) -> Void) {
-        completion(GatewaySwitcherWidgetEntry(date: Date()))
+        let profiles = ProfileStore().profiles
+        completion(GatewaySwitcherWidgetEntry(date: Date(), profiles: profiles.isEmpty ? GatewayProfile.defaults : profiles))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<GatewaySwitcherWidgetEntry>) -> Void) {
-        let entry = GatewaySwitcherWidgetEntry(date: Date())
+        let profiles = ProfileStore().profiles
+        let entry = GatewaySwitcherWidgetEntry(date: Date(), profiles: profiles.isEmpty ? GatewayProfile.defaults : profiles)
         completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(300))))
     }
 }
@@ -30,7 +33,7 @@ struct GatewaySwitcherWidgetView: View {
                 .font(.headline)
 
             HStack(spacing: 8) {
-                ForEach(WidgetGatewayProfile.allCases, id: \.rawValue) { profile in
+                ForEach(entry.profiles.prefix(3)) { profile in
                     gatewayButton(profile)
                 }
             }
@@ -43,7 +46,7 @@ struct GatewaySwitcherWidgetView: View {
         .containerBackground(.regularMaterial, for: .widget)
     }
 
-    private func gatewayButton(_ profile: WidgetGatewayProfile) -> some View {
+    private func gatewayButton(_ profile: GatewayProfile) -> some View {
         Link(destination: profile.deepLinkURL) {
             VStack(spacing: 6) {
                 Image(systemName: profile.symbolName)
@@ -68,7 +71,7 @@ struct GatewaySwitcherWidget: Widget {
             GatewaySwitcherWidgetView(entry: entry)
         }
         .configurationDisplayName("切换网关")
-        .description("从桌面小组件切换 192.168.31.1 / 192.168.31.2 / 192.168.31.3。")
+        .description("从桌面小组件快速切换已配置的网关。")
         .supportedFamilies([.systemSmall])
     }
 }

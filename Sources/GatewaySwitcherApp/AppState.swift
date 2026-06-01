@@ -1,7 +1,9 @@
 import Foundation
+import SharedKit
 #if canImport(GatewayKit)
 import GatewayKit
 #endif
+import WidgetKit
 
 @MainActor
 final class AppState: ObservableObject {
@@ -12,6 +14,7 @@ final class AppState: ObservableObject {
         localIPv4: nil,
         dnsServers: []
     )
+    @Published private(set) var profiles: [GatewayProfile] = []
     @Published private(set) var isRefreshing = false
     @Published private(set) var isSwitching = false
     @Published private(set) var switchingProfile: GatewayProfile?
@@ -23,6 +26,8 @@ final class AppState: ObservableObject {
     private let passwordlessStatusProvider: @Sendable () -> Bool
     private let gatewaySwitchAction: @Sendable (GatewayProfile, NetworkSnapshot) throws -> Void
     private let helperInstallAction: @Sendable (String) throws -> Void
+    private let whitelistUpdateAction: @Sendable ([String]) throws -> Void
+    private let widgetReloadAction: @Sendable () -> Void
     private var timer: Timer?
 
     init(
@@ -34,13 +39,20 @@ final class AppState: ObservableObject {
         helperInstallAction: @escaping @Sendable (String) throws -> Void = { installerPath in
             try PasswordlessHelper.install(installerPath: installerPath)
         },
+        whitelistUpdateAction: @escaping @Sendable ([String]) throws -> Void = { ips in
+            try HelperWhitelistUpdater.update(ips: ips)
+        },
+        widgetReloadAction: @escaping @Sendable () -> Void = { WidgetCenter.shared.reloadAllTimelines() },
         startsTimer: Bool = true
     ) {
         self.snapshotProvider = snapshotProvider
         self.passwordlessStatusProvider = passwordlessStatusProvider
         self.gatewaySwitchAction = gatewaySwitchAction
         self.helperInstallAction = helperInstallAction
+        self.whitelistUpdateAction = whitelistUpdateAction
+        self.widgetReloadAction = widgetReloadAction
 
+        loadProfiles()
         refresh()
         refreshPasswordlessStatus()
 
@@ -60,7 +72,7 @@ final class AppState: ObservableObject {
     }
 
     var activeProfile: GatewayProfile? {
-        snapshot.activeProfile
+        snapshot.activeProfile(from: profiles)
     }
 
     var displayGateway: String? {
@@ -73,6 +85,31 @@ final class AppState: ObservableObject {
 
     var menuSymbolName: String {
         activeProfile?.symbolName ?? "network"
+    }
+
+    func loadProfiles() {
+        profiles = ProfileStore.shared.initializeDefaultsIfNeeded()
+    }
+
+    func addProfile(_ profile: GatewayProfile) {
+        ProfileStore.shared.add(profile)
+        profiles = ProfileStore.shared.profiles
+        widgetReloadAction()
+        syncWhitelistIfNeeded()
+    }
+
+    func deleteProfile(id: UUID) {
+        ProfileStore.shared.delete(id: id)
+        profiles = ProfileStore.shared.profiles
+        widgetReloadAction()
+        syncWhitelistIfNeeded()
+    }
+
+    func updateProfile(_ profile: GatewayProfile) {
+        ProfileStore.shared.update(profile)
+        profiles = ProfileStore.shared.profiles
+        widgetReloadAction()
+        syncWhitelistIfNeeded()
     }
 
     func refresh() {
@@ -117,6 +154,7 @@ final class AppState: ObservableObject {
                     self.isPasswordlessEnabled = helperInstalled
                     self.isInstallingHelper = false
                     self.statusMessage = helperInstalled ? "免密切换已启用，后续切换不再需要输入密码。" : "helper 已安装，但免密状态验证失败。"
+                    self.syncWhitelistIfNeeded()
                 }
             } catch {
                 await MainActor.run {
@@ -159,16 +197,42 @@ final class AppState: ObservableObject {
     }
 
     func handleDeepLink(_ url: URL) {
-        guard
-            url.scheme == "gatewayswitcher",
-            url.host == "switch",
-            let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-            let profileValue = components.queryItems?.first(where: { $0.name == "profile" })?.value,
-            let profile = GatewayProfile(rawValue: profileValue)
-        else {
+        guard url.scheme == "gatewayswitcher", url.host == "switch" else { return }
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+
+        // New format: id=<uuid>
+        if let idString = components?.queryItems?.first(where: { $0.name == "id" })?.value,
+           let uuid = UUID(uuidString: idString),
+           let profile = profiles.first(where: { $0.id == uuid }) {
+            switchGateway(to: profile)
             return
         }
 
-        switchGateway(to: profile)
+        // Legacy format: profile=<rawValue> (backward compat)
+        if let legacyValue = components?.queryItems?.first(where: { $0.name == "profile" })?.value {
+            let legacyMapping: [String: UUID] = [
+                "china":    UUID(uuidString: "A1B2C3D4-E5F6-7890-ABCD-EF1234567890")!,
+                "dotTwo":   UUID(uuidString: "A1B2C3D4-E5F6-7890-ABCD-EF1234567891")!,
+                "proxy":    UUID(uuidString: "A1B2C3D4-E5F6-7890-ABCD-EF1234567892")!,
+            ]
+            if let uuid = legacyMapping[legacyValue],
+               let profile = profiles.first(where: { $0.id == uuid }) {
+                switchGateway(to: profile)
+                return
+            }
+        }
+    }
+
+    private func syncWhitelistIfNeeded() {
+        guard isPasswordlessEnabled else { return }
+        let ips = profiles.map { $0.gateway } + profiles.flatMap { $0.dnsServers }
+
+        Task.detached(priority: .utility) { [whitelistUpdateAction, ips] in
+            do {
+                try whitelistUpdateAction(ips)
+            } catch {
+                // Whitelist update failure is non-critical — the fallback osascript auth will handle it
+            }
+        }
     }
 }

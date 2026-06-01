@@ -1,7 +1,8 @@
+import SwiftUI
+import SharedKit
 #if canImport(GatewayKit)
 import GatewayKit
 #endif
-import SwiftUI
 
 @main
 struct GatewaySwitcherApp: App {

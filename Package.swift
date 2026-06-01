@@ -13,11 +13,11 @@ let package = Package(
         .executable(name: "GatewaySwitcherWidgetExtension", targets: ["GatewaySwitcherWidget"])
     ],
     targets: [
-        .target(name: "GatewayKit"),
+        .target(name: "GatewayKit", dependencies: ["SharedKit"]),
         .target(name: "SharedKit"),
         .executableTarget(
             name: "GatewaySwitcherApp",
-            dependencies: ["GatewayKit"],
+            dependencies: ["GatewayKit", "SharedKit"],
             resources: [
                 .process("Resources")
             ]
@@ -28,7 +28,7 @@ let package = Package(
         ),
         .testTarget(
             name: "GatewayKitTests",
-            dependencies: ["GatewayKit", "GatewaySwitcherApp"]
+            dependencies: ["GatewayKit", "GatewaySwitcherApp", "SharedKit"]
         )
     ]
 )

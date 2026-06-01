@@ -1,7 +1,8 @@
+import SwiftUI
+import SharedKit
 #if canImport(GatewayKit)
 import GatewayKit
 #endif
-import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var appState: AppState
@@ -48,7 +49,7 @@ private struct HeaderView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("网关切换器")
                     .font(.system(size: 28, weight: .bold))
-                Text("当前使用 \(appState.displayGateway ?? "检测中")，可在 .1、.2 和 .3 网关之间快速切换。")
+                Text("当前使用 \(appState.displayGateway ?? "检测中")，可在已配置的网关之间快速切换。")
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
@@ -61,6 +62,23 @@ private struct HeaderView: View {
                 Label("刷新", systemImage: appState.isRefreshing ? "arrow.triangle.2.circlepath.circle" : "arrow.clockwise")
             }
             .disabled(appState.isRefreshing)
+
+            Button {
+                openManagementView()
+            } label: {
+                Label("管理", systemImage: "gearshape")
+            }
+        }
+    }
+
+    private func openManagementView() {
+        if let window = NSApp.windows.first(where: { $0.title == "网关配置" }) {
+            window.makeKeyAndOrderFront(nil)
+        } else {
+            let vc = NSHostingController(rootView: ProfileManagementView().environmentObject(appState))
+            let window = NSWindow(contentViewController: vc)
+            window.title = "网关配置"
+            window.makeKeyAndOrderFront(nil)
         }
     }
 }
@@ -72,9 +90,15 @@ private struct GatewayProfilePicker: View {
     ]
 
     var body: some View {
-        LazyVGrid(columns: columns, alignment: .leading, spacing: 14) {
-            ForEach(GatewayProfile.allCases) { profile in
-                GatewayProfileCard(profile: profile)
+        if appState.profiles.isEmpty {
+            Text("暂无网关配置，请点击「管理」添加。")
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, minHeight: 80)
+        } else {
+            LazyVGrid(columns: columns, alignment: .leading, spacing: 14) {
+                ForEach(appState.profiles) { profile in
+                    GatewayProfileCard(profile: profile)
+                }
             }
         }
     }
@@ -85,7 +109,7 @@ private struct GatewayProfileCard: View {
     let profile: GatewayProfile
 
     private var isActive: Bool {
-        appState.activeProfile == profile
+        appState.activeProfile?.id == profile.id
     }
 
     var body: some View {
@@ -115,7 +139,7 @@ private struct GatewayProfileCard: View {
             Button {
                 appState.switchGateway(to: profile)
             } label: {
-                if appState.switchingProfile == profile {
+                if appState.switchingProfile?.id == profile.id {
                     Label("正在切换", systemImage: "arrow.triangle.2.circlepath")
                         .frame(maxWidth: .infinity)
                 } else {
@@ -172,7 +196,7 @@ private struct PasswordlessHelperBanner: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(appState.isPasswordlessEnabled ? "免密切换已启用" : "可安装免密切换")
                     .font(.headline)
-                Text(appState.isPasswordlessEnabled ? "后续切换会走受限 helper，不再反复要求管理员密码。" : "首次安装需要管理员密码；之后只允许免密切换 192.168.31.1 / 192.168.31.2 / 192.168.31.3。")
+                Text(appState.isPasswordlessEnabled ? "后续切换会走受限 helper，不再反复要求管理员密码。" : "首次安装需要管理员密码；之后只允许免密切换已配置的网关 IP。")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -280,15 +304,10 @@ private struct FooterView: View {
     }
 }
 
-private extension GatewayProfile {
+extension GatewayProfile {
     var accentColor: Color {
-        switch self {
-        case .china:
-            return .green
-        case .dotTwo:
-            return .orange
-        case .proxy:
-            return .blue
-        }
+        let palette: [Color] = [.green, .orange, .blue, .purple, .red, .teal, .indigo, .yellow]
+        let index = abs(id.hashValue) % palette.count
+        return palette[index]
     }
 }

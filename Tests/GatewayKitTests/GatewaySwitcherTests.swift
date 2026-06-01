@@ -1,5 +1,6 @@
 import XCTest
 @testable import GatewayKit
+import SharedKit
 
 final class GatewaySwitcherTests: XCTestCase {
     func testSwitchFallsBackToAdminAuthorizationWhenInstalledHelperRejectsCurrentServiceName() throws {
@@ -17,7 +18,8 @@ final class GatewaySwitcherTests: XCTestCase {
             dnsServers: ["192.168.31.2"]
         )
 
-        try switcher.switchDefaultGateway(to: .china, snapshot: snapshot)
+        let chinaProfile = GatewayProfile.defaults[0]
+        try switcher.switchDefaultGateway(to: chinaProfile, snapshot: snapshot)
 
         XCTAssertEqual(runner.commands.map(\.executable), ["/usr/bin/sudo", "/usr/bin/osascript"])
         XCTAssertTrue(runner.commands[1].arguments.joined(separator: " ").contains("USB 10/100/1000 LAN"))

@@ -1,7 +1,8 @@
+import SwiftUI
+import SharedKit
 #if canImport(GatewayKit)
 import GatewayKit
 #endif
-import SwiftUI
 
 struct MenuBarContentView: View {
     @EnvironmentObject private var appState: AppState
@@ -19,16 +20,22 @@ struct MenuBarContentView: View {
 
             Divider()
 
-            ForEach(GatewayProfile.allCases) { profile in
+            ForEach(appState.profiles) { profile in
                 Button {
                     appState.switchGateway(to: profile)
                 } label: {
                     Label(profile.title, systemImage: profile.symbolName)
                 }
-                .disabled(appState.activeProfile == profile || appState.isSwitching)
+                .disabled(appState.activeProfile?.id == profile.id || appState.isSwitching)
             }
 
             Divider()
+
+            Button {
+                openManagementView()
+            } label: {
+                Label("管理网关...", systemImage: "gearshape")
+            }
 
             if !appState.isPasswordlessEnabled {
                 Button {
@@ -51,5 +58,16 @@ struct MenuBarContentView: View {
             }
         }
         .padding(.vertical, 6)
+    }
+
+    private func openManagementView() {
+        if let window = NSApp.windows.first(where: { $0.title == "网关配置" }) {
+            window.makeKeyAndOrderFront(nil)
+        } else {
+            let vc = NSHostingController(rootView: ProfileManagementView().environmentObject(appState))
+            let window = NSWindow(contentViewController: vc)
+            window.title = "网关配置"
+            window.makeKeyAndOrderFront(nil)
+        }
     }
 }

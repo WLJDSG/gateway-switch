@@ -5,7 +5,7 @@ MODE="${1:-run}"
 APP_NAME="GatewaySwitcher"
 WIDGET_NAME="GatewaySwitcherWidgetExtension"
 BUNDLE_ID="com.wenlanjun.GatewaySwitcher"
-MIN_SYSTEM_VERSION="13.0"
+MIN_SYSTEM_VERSION="14.0"
 INSTALL_APP_BUNDLE="/Applications/$APP_NAME.app"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -17,6 +17,8 @@ APP_MACOS="$APP_CONTENTS/MacOS"
 APP_RESOURCES="$APP_CONTENTS/Resources"
 APP_BINARY="$APP_MACOS/$APP_NAME"
 INFO_PLIST="$APP_CONTENTS/Info.plist"
+ENTITLEMENTS_APP="$ROOT_DIR/Config/App/GatewaySwitcher.entitlements"
+ENTITLEMENTS_WIDGET="$ROOT_DIR/Config/Widget/GatewaySwitcherWidget.entitlements"
 
 cd "$ROOT_DIR"
 
@@ -56,6 +58,16 @@ if [[ -x "$WIDGET_BINARY" ]]; then
   if [[ -f "Config/Widget/Info.plist" ]]; then
     cp Config/Widget/Info.plist "$WIDGET_APPEX/Contents/Info.plist"
   fi
+
+  # Codesign widget with entitlements for App Group access
+  if [[ -f "$ENTITLEMENTS_WIDGET" ]]; then
+    /usr/bin/codesign --force --entitlements "$ENTITLEMENTS_WIDGET" --sign - "$WIDGET_APPEX"
+  fi
+fi
+
+# Codesign app with entitlements for App Group access
+if [[ -f "$ENTITLEMENTS_APP" ]]; then
+  /usr/bin/codesign --force --entitlements "$ENTITLEMENTS_APP" --sign - "$APP_BUNDLE"
 fi
 
 # Generate app Info.plist

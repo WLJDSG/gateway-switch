@@ -3,6 +3,7 @@ set -euo pipefail
 
 HELPER_PATH="/usr/local/bin/gateway-switcher-helper"
 SUDOERS_PATH="/etc/sudoers.d/gateway-switcher"
+ALLOWED_IPS_PATH="/etc/gateway-switcher-allowed-ips.conf"
 CONSOLE_USER="$(/usr/bin/stat -f %Su /dev/console)"
 
 if [[ -z "$CONSOLE_USER" || "$CONSOLE_USER" == "root" ]]; then
@@ -20,6 +21,7 @@ NETWORKSETUP="/usr/sbin/networksetup"
 ROUTE="/sbin/route"
 DSCACHEUTIL="/usr/bin/dscacheutil"
 KILLALL="/usr/bin/killall"
+ALLOWED_IPS_PATH="/etc/gateway-switcher-allowed-ips.conf"
 
 is_ipv4() {
   local ip="$1"
@@ -29,6 +31,22 @@ is_ipv4() {
     [[ "$octet" =~ ^[0-9]+$ ]] || return 1
     (( octet >= 0 && octet <= 255 )) || return 1
   done
+}
+
+is_allowed() {
+  local ip="$1"
+  local allowed_ips
+  if [[ -f "$ALLOWED_IPS_PATH" ]]; then
+    allowed_ips="$(/bin/cat "$ALLOWED_IPS_PATH")"
+  else
+    allowed_ips="192.168.31.1 192.168.31.2 192.168.31.3"
+  fi
+  for allowed in $allowed_ips; do
+    if [[ "$ip" == "$allowed" ]]; then
+      return 0
+    fi
+  done
+  return 1
 }
 
 if [[ "${1:-}" == "--check" ]]; then
@@ -75,15 +93,18 @@ if [[ -z "$SERVICE" || -z "$IP" || -z "$SUBNET" || -z "$ROUTER" || -z "$DNS" ]];
   exit 2
 fi
 
-if [[ "$ROUTER" != "192.168.31.1" && "$ROUTER" != "192.168.31.2" && "$ROUTER" != "192.168.31.3" ]]; then
+if ! is_allowed "$ROUTER"; then
   echo "Router is not allowed: $ROUTER" >&2
   exit 2
 fi
 
-if [[ "$DNS" != "192.168.31.1" && "$DNS" != "192.168.31.2" && "$DNS" != "192.168.31.3" ]]; then
-  echo "DNS is not allowed: $DNS" >&2
-  exit 2
-fi
+IFS=',' read -ra DNS_SERVERS <<< "$DNS"
+for dns_server in "${DNS_SERVERS[@]}"; do
+  if ! is_allowed "$dns_server"; then
+    echo "DNS is not allowed: $dns_server" >&2
+    exit 2
+  fi
+done
 
 if [[ "$SERVICE" == *$'\n'* || "$SERVICE" == *$'\r'* ]]; then
   echo "Service name is not allowed." >&2
@@ -102,6 +123,15 @@ HELPER
 
 /bin/chmod 755 "$HELPER_PATH"
 /usr/sbin/chown root:wheel "$HELPER_PATH"
+
+# Create initial allowed IPs config
+/bin/cat >"$ALLOWED_IPS_PATH" <<EOF
+192.168.31.1
+192.168.31.2
+192.168.31.3
+EOF
+/bin/chmod 644 "$ALLOWED_IPS_PATH"
+/usr/sbin/chown root:wheel "$ALLOWED_IPS_PATH"
 
 TMP_SUDOERS="$(/usr/bin/mktemp /tmp/gateway-switcher-sudoers.XXXXXX)"
 /bin/cat >"$TMP_SUDOERS" <<SUDOERS
