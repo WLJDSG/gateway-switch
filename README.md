@@ -8,18 +8,34 @@
 - 一键切换到国内网关 `192.168.31.1`
 - 一键切换到 `.2 网关` `192.168.31.2`
 - 一键切换到代理网关 `192.168.31.3`
-- 切换网关时同步写入 DNS：每个网关使用对应的 `192.168.31.x` 地址
+- 切换网关时同步写入 DNS
 - 提供主窗口和菜单栏快捷入口
 - 支持安装一次性授权的免密 helper，后续切换不再反复输入密码
-- 提供 WidgetKit 小组件源码，可做成桌面小组件按钮
+- 支持 URL Scheme 深度链接切换网关（`gatewayswitcher://switch?profile=china`）
+- 桌面小组件快速切换
+
+## 构建
+
+```bash
+swift build
+```
 
 ## 运行
 
 ```bash
-./script/build_and_run.sh
+./script/build_and_run.sh          # 构建 .app 并运行
+./script/build_and_run.sh --install # 安装到 /Applications 并运行
 ```
 
-也可以在 Codex 里使用项目的 `Run` 动作。现在项目包含 `GatewaySwitcher.xcodeproj`，脚本会优先使用 Xcode 工程构建主 App 和 Widget Extension。
+脚本使用 SPM 构建后手动组装 .app bundle，包括嵌入 Widget Extension。
+
+## 在 Xcode 中开发
+
+```bash
+xed .
+```
+
+Xcode 会从 Package.swift 自动生成项目，无需 .xcodeproj 文件。
 
 ## 说明
 
@@ -30,7 +46,7 @@ networksetup -setmanual Wi-Fi 192.168.31.42 255.255.255.0 192.168.31.2
 networksetup -setdnsservers Wi-Fi 192.168.31.2
 ```
 
-如果没有安装免密 helper，切换时 macOS 会弹出管理员授权。点击应用里的“安装免密切换”后，会安装：
+如果没有安装免密 helper，切换时 macOS 会弹出管理员授权。点击应用里的"安装免密切换"后，会安装：
 
 - `/usr/local/bin/gateway-switcher-helper`
 - `/etc/sudoers.d/gateway-switcher`
@@ -39,18 +55,27 @@ sudoers 规则只允许当前登录用户免密执行这个 helper。helper 内�
 
 ## 桌面小组件
 
-小组件源码位于 `Sources/GatewaySwitcherWidget/GatewaySwitcherWidget.swift`。它提供三个按钮：
+小组件源码位于 `Sources/GatewaySwitcherWidget/GatewaySwitcherWidget.swift`，通过 `SharedKit` 共享 `WidgetGatewayProfile` 定义。
 
-- 国内网关 `192.168.31.1`
-- `.2 网关` `192.168.31.2`
-- 代理网关 `192.168.31.3`
+小组件按钮依赖免密 helper；请先在主 App 中点击"安装免密切换"。
 
-项目已经包含 `GatewaySwitcher.xcodeproj`，其中有三个 target：
+## 项目结构
 
-- `GatewaySwitcher`：主 macOS App
-- `GatewayKit`：共享网关切换逻辑
-- `GatewaySwitcherWidgetExtension`：桌面小组件扩展
-
-使用 Xcode 打开 `GatewaySwitcher.xcodeproj`，选择 `GatewaySwitcher` scheme 运行。构建出来的 App 会在 `Contents/PlugIns/` 内嵌 `GatewaySwitcherWidgetExtension.appex`，系统就能注册这个桌面小组件。
-
-小组件按钮依赖免密 helper；请先在主 App 中点击“安装免密切换”。
+```
+Package.swift              — SPM 项目定义（唯一入口）
+Sources/
+  GatewayKit/              — 网关切换核心逻辑库
+  SharedKit/               — App 与 Widget 共享的类型（WidgetGatewayProfile）
+  GatewaySwitcherApp/      — macOS App 入口 + SwiftUI 界面
+    Resources/             — Assets.xcassets（应用图标）
+  GatewaySwitcherWidget/   — WidgetKit 桌面小组件
+Tests/
+  GatewayKitTests/         — 单元测试
+Config/
+  App/Info.plist           — App Info.plist（SPM 不允许作为资源，由构建脚本引用）
+  Widget/Info.plist        — Widget Info.plist
+script/
+  build_and_run.sh         — 构建 .app bundle 并运行
+  install_passwordless_helper.sh — 免密 helper 安装脚本
+  generate_app_icon.swift  — 图标生成工具
+```
