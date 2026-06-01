@@ -1,6 +1,6 @@
 import XCTest
-@testable import GatewayKit
-import SharedKit
+@testable import SwitcherFeature
+import Core
 
 final class GatewaySwitcherTests: XCTestCase {
     func testSwitchFallsBackToAdminAuthorizationWhenInstalledHelperRejectsCurrentServiceName() throws {

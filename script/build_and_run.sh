@@ -38,8 +38,8 @@ cp "$BUILD_DIR/$APP_NAME" "$APP_BINARY"
 chmod +x "$APP_BINARY"
 
 # Bundle assets
-if [[ -d "Sources/GatewaySwitcherApp/Resources/Assets.xcassets" ]]; then
-  cp -R Sources/GatewaySwitcherApp/Resources/Assets.xcassets "$APP_RESOURCES/Assets.xcassets"
+if [[ -d "GatewaySwitcherApp/Resources/Assets.xcassets" ]]; then
+  cp -R GatewaySwitcherApp/Resources/Assets.xcassets "$APP_RESOURCES/Assets.xcassets"
 fi
 
 cp "$ROOT_DIR/script/install_passwordless_helper.sh" "$APP_RESOURCES/install_passwordless_helper.sh"

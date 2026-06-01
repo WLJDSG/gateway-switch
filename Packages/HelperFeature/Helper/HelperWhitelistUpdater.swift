@@ -1,4 +1,5 @@
 import Foundation
+import Core
 
 public enum HelperWhitelistUpdater: Sendable {
     public static let whitelistPath = "/etc/gateway-switcher-allowed-ips.conf"

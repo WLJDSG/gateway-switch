@@ -1,18 +1,18 @@
 import SwiftUI
-import SharedKit
-#if canImport(GatewayKit)
-import GatewayKit
+import Core
+#if canImport(SwitcherFeature)
+import SwitcherFeature
 #endif
 
 struct MenuBarContentView: View {
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var viewModel: AppViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(appState.snapshot.gateway ?? "未知网关")
+            Text(viewModel.snapshot.gateway ?? "未知网关")
                 .font(.headline)
 
-            if let localIP = appState.snapshot.localIPv4 {
+            if let localIP = viewModel.snapshot.localIPv4 {
                 Text(localIP)
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -20,13 +20,13 @@ struct MenuBarContentView: View {
 
             Divider()
 
-            ForEach(appState.profiles) { profile in
+            ForEach(viewModel.profiles) { profile in
                 Button {
-                    appState.switchGateway(to: profile)
+                    viewModel.switchGateway(to: profile)
                 } label: {
                     Label(profile.title, systemImage: profile.symbolName)
                 }
-                .disabled(appState.activeProfile?.id == profile.id || appState.isSwitching)
+                .disabled(viewModel.activeProfile?.id == profile.id || viewModel.isSwitching)
             }
 
             Divider()
@@ -37,21 +37,21 @@ struct MenuBarContentView: View {
                 Label("管理网关...", systemImage: "gearshape")
             }
 
-            if !appState.isPasswordlessEnabled {
+            if !viewModel.isPasswordlessEnabled {
                 Button {
-                    appState.installPasswordlessHelper()
+                    viewModel.installPasswordlessHelper()
                 } label: {
                     Label("安装免密切换", systemImage: "key")
                 }
-                .disabled(appState.isInstallingHelper)
+                .disabled(viewModel.isInstallingHelper)
             }
 
             Button {
-                appState.refresh()
+                viewModel.refresh()
             } label: {
                 Label("刷新状态", systemImage: "arrow.clockwise")
             }
-            .disabled(appState.isRefreshing)
+            .disabled(viewModel.isRefreshing)
 
             Button("退出") {
                 NSApplication.shared.terminate(nil)
@@ -64,7 +64,7 @@ struct MenuBarContentView: View {
         if let window = NSApp.windows.first(where: { $0.title == "网关配置" }) {
             window.makeKeyAndOrderFront(nil)
         } else {
-            let vc = NSHostingController(rootView: ProfileManagementView().environmentObject(appState))
+            let vc = NSHostingController(rootView: ProfileManagementView().environmentObject(viewModel))
             let window = NSWindow(contentViewController: vc)
             window.title = "网关配置"
             window.makeKeyAndOrderFront(nil)

@@ -1,5 +1,4 @@
 import Foundation
-import SharedKit
 
 public struct NetworkSnapshot: Equatable, Sendable {
     public var gateway: String?

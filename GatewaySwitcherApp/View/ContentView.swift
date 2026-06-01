@@ -1,11 +1,11 @@
 import SwiftUI
-import SharedKit
-#if canImport(GatewayKit)
-import GatewayKit
+import Core
+#if canImport(SwitcherFeature)
+import SwitcherFeature
 #endif
 
 struct ContentView: View {
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var viewModel: AppViewModel
 
     var body: some View {
         ZStack {
@@ -25,31 +25,31 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity, alignment: .topLeading)
             }
 
-            if appState.isSwitching {
+            if viewModel.isSwitching {
                 SwitchingOverlay()
                     .transition(.opacity)
             }
         }
         .background(.background)
-        .animation(.easeInOut(duration: 0.18), value: appState.isSwitching)
+        .animation(.easeInOut(duration: 0.18), value: viewModel.isSwitching)
     }
 }
 
 private struct HeaderView: View {
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var viewModel: AppViewModel
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
-            Image(systemName: appState.activeProfile?.symbolName ?? "network")
+            Image(systemName: viewModel.activeProfile?.symbolName ?? "network")
                 .font(.system(size: 38, weight: .semibold))
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(appState.activeProfile?.accentColor ?? .green)
+                .foregroundStyle(viewModel.activeProfile?.accentColor ?? .green)
                 .frame(width: 56, height: 56)
 
             VStack(alignment: .leading, spacing: 6) {
                 Text("网关切换器")
                     .font(.system(size: 28, weight: .bold))
-                Text("当前使用 \(appState.displayGateway ?? "检测中")，可在已配置的网关之间快速切换。")
+                Text("当前使用 \(viewModel.displayGateway ?? "检测中")，可在已配置的网关之间快速切换。")
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
@@ -57,11 +57,11 @@ private struct HeaderView: View {
             Spacer()
 
             Button {
-                appState.refresh()
+                viewModel.refresh()
             } label: {
-                Label("刷新", systemImage: appState.isRefreshing ? "arrow.triangle.2.circlepath.circle" : "arrow.clockwise")
+                Label("刷新", systemImage: viewModel.isRefreshing ? "arrow.triangle.2.circlepath.circle" : "arrow.clockwise")
             }
-            .disabled(appState.isRefreshing)
+            .disabled(viewModel.isRefreshing)
 
             Button {
                 openManagementView()
@@ -75,7 +75,7 @@ private struct HeaderView: View {
         if let window = NSApp.windows.first(where: { $0.title == "网关配置" }) {
             window.makeKeyAndOrderFront(nil)
         } else {
-            let vc = NSHostingController(rootView: ProfileManagementView().environmentObject(appState))
+            let vc = NSHostingController(rootView: ProfileManagementView().environmentObject(viewModel))
             let window = NSWindow(contentViewController: vc)
             window.title = "网关配置"
             window.makeKeyAndOrderFront(nil)
@@ -84,19 +84,19 @@ private struct HeaderView: View {
 }
 
 private struct GatewayProfilePicker: View {
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var viewModel: AppViewModel
     private let columns = [
         GridItem(.adaptive(minimum: 230), spacing: 14)
     ]
 
     var body: some View {
-        if appState.profiles.isEmpty {
+        if viewModel.profiles.isEmpty {
             Text("暂无网关配置，请点击「管理」添加。")
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, minHeight: 80)
         } else {
             LazyVGrid(columns: columns, alignment: .leading, spacing: 14) {
-                ForEach(appState.profiles) { profile in
+                ForEach(viewModel.profiles) { profile in
                     GatewayProfileCard(profile: profile)
                 }
             }
@@ -105,11 +105,11 @@ private struct GatewayProfilePicker: View {
 }
 
 private struct GatewayProfileCard: View {
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var viewModel: AppViewModel
     let profile: GatewayProfile
 
     private var isActive: Bool {
-        appState.activeProfile?.id == profile.id
+        viewModel.activeProfile?.id == profile.id
     }
 
     var body: some View {
@@ -137,9 +137,9 @@ private struct GatewayProfileCard: View {
                 .foregroundStyle(.secondary)
 
             Button {
-                appState.switchGateway(to: profile)
+                viewModel.switchGateway(to: profile)
             } label: {
-                if appState.switchingProfile?.id == profile.id {
+                if viewModel.switchingProfile?.id == profile.id {
                     Label("正在切换", systemImage: "arrow.triangle.2.circlepath")
                         .frame(maxWidth: .infinity)
                 } else {
@@ -149,7 +149,7 @@ private struct GatewayProfileCard: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
-            .disabled(isActive || appState.isSwitching)
+            .disabled(isActive || viewModel.isSwitching)
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -162,7 +162,7 @@ private struct GatewayProfileCard: View {
 }
 
 private struct SwitchingOverlay: View {
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var viewModel: AppViewModel
 
     var body: some View {
         VStack(spacing: 14) {
@@ -170,7 +170,7 @@ private struct SwitchingOverlay: View {
                 .controlSize(.large)
             Text("正在切换网关")
                 .font(.headline)
-            Text("目标 \(appState.switchingProfile?.gateway ?? "网关")，正在同步 IPv4 路由器和 DNS。")
+            Text("目标 \(viewModel.switchingProfile?.gateway ?? "网关")，正在同步 IPv4 路由器和 DNS。")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -185,31 +185,31 @@ private struct SwitchingOverlay: View {
 }
 
 private struct PasswordlessHelperBanner: View {
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var viewModel: AppViewModel
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: appState.isPasswordlessEnabled ? "checkmark.shield.fill" : "lock.shield")
-                .foregroundStyle(appState.isPasswordlessEnabled ? .green : .orange)
+            Image(systemName: viewModel.isPasswordlessEnabled ? "checkmark.shield.fill" : "lock.shield")
+                .foregroundStyle(viewModel.isPasswordlessEnabled ? .green : .orange)
                 .font(.title3)
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(appState.isPasswordlessEnabled ? "免密切换已启用" : "可安装免密切换")
+                Text(viewModel.isPasswordlessEnabled ? "免密切换已启用" : "可安装免密切换")
                     .font(.headline)
-                Text(appState.isPasswordlessEnabled ? "后续切换会走受限 helper，不再反复要求管理员密码。" : "首次安装需要管理员密码；之后只允许免密切换已配置的网关 IP。")
+                Text(viewModel.isPasswordlessEnabled ? "后续切换会走受限 helper，不再反复要求管理员密码。" : "首次安装需要管理员密码；之后只允许免密切换已配置的网关 IP。")
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
 
-            if !appState.isPasswordlessEnabled {
+            if !viewModel.isPasswordlessEnabled {
                 Button {
-                    appState.installPasswordlessHelper()
+                    viewModel.installPasswordlessHelper()
                 } label: {
-                    Label(appState.isInstallingHelper ? "安装中" : "安装", systemImage: "key")
+                    Label(viewModel.isInstallingHelper ? "安装中" : "安装", systemImage: "key")
                 }
-                .disabled(appState.isInstallingHelper)
+                .disabled(viewModel.isInstallingHelper)
             }
         }
         .padding(14)
@@ -218,25 +218,25 @@ private struct PasswordlessHelperBanner: View {
 }
 
 private struct NetworkInfoGrid: View {
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var viewModel: AppViewModel
 
     var body: some View {
         Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 14) {
             GridRow {
-                InfoTile(title: "本机 IP", value: appState.snapshot.localIPv4 ?? "未检测到", symbol: "laptopcomputer")
-                InfoTile(title: "默认网关", value: appState.snapshot.gateway ?? "未检测到", symbol: "router")
+                InfoTile(title: "本机 IP", value: viewModel.snapshot.localIPv4 ?? "未检测到", symbol: "laptopcomputer")
+                InfoTile(title: "默认网关", value: viewModel.snapshot.gateway ?? "未检测到", symbol: "router")
             }
             GridRow {
-                InfoTile(title: "子网掩码", value: appState.snapshot.subnetMask ?? "未知", symbol: "rectangle.3.group")
-                InfoTile(title: "网络服务", value: appState.snapshot.serviceName ?? "未知", symbol: "wifi")
+                InfoTile(title: "子网掩码", value: viewModel.snapshot.subnetMask ?? "未知", symbol: "rectangle.3.group")
+                InfoTile(title: "网络服务", value: viewModel.snapshot.serviceName ?? "未知", symbol: "wifi")
             }
             GridRow {
-                InfoTile(title: "接口", value: appState.snapshot.interfaceName ?? "未知", symbol: "point.3.connected.trianglepath.dotted")
-                InfoTile(title: "DNS", value: appState.snapshot.dnsServers.isEmpty ? "系统默认 / 未设置" : appState.snapshot.dnsServers.joined(separator: ", "), symbol: "server.rack")
+                InfoTile(title: "接口", value: viewModel.snapshot.interfaceName ?? "未知", symbol: "point.3.connected.trianglepath.dotted")
+                InfoTile(title: "DNS", value: viewModel.snapshot.dnsServers.isEmpty ? "系统默认 / 未设置" : viewModel.snapshot.dnsServers.joined(separator: ", "), symbol: "server.rack")
             }
             GridRow {
-                InfoTile(title: "更新时间", value: appState.snapshot.capturedAt.formatted(date: .omitted, time: .standard), symbol: "clock")
-                InfoTile(title: "授权", value: appState.isPasswordlessEnabled ? "免密 helper" : "管理员授权", symbol: "key")
+                InfoTile(title: "更新时间", value: viewModel.snapshot.capturedAt.formatted(date: .omitted, time: .standard), symbol: "clock")
+                InfoTile(title: "授权", value: viewModel.isPasswordlessEnabled ? "免密 helper" : "管理员授权", symbol: "key")
             }
         }
     }
@@ -272,21 +272,21 @@ private struct InfoTile: View {
 }
 
 private struct FooterView: View {
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var viewModel: AppViewModel
 
     var body: some View {
         HStack {
-            if appState.isSwitching {
+            if viewModel.isSwitching {
                 ProgressView()
                     .controlSize(.small)
                 Text("正在写入 IPv4 路由器和 DNS...")
                     .foregroundStyle(.secondary)
-            } else if appState.isInstallingHelper {
+            } else if viewModel.isInstallingHelper {
                 ProgressView()
                     .controlSize(.small)
                 Text("正在安装免密 helper...")
                     .foregroundStyle(.secondary)
-            } else if let message = appState.statusMessage {
+            } else if let message = viewModel.statusMessage {
                 Image(systemName: message.contains("失败") ? "exclamationmark.triangle" : "info.circle")
                     .foregroundStyle(message.contains("失败") ? .orange : .secondary)
                 Text(message)

@@ -1,5 +1,7 @@
 import Foundation
-import SharedKit
+import Core
+import InspectorFeature
+import HelperFeature
 
 public struct GatewaySwitcher: Sendable {
     private let runner: CommandRunning

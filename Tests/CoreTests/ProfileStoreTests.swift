@@ -1,5 +1,5 @@
 import XCTest
-import SharedKit
+import Core
 
 final class ProfileStoreTests: XCTestCase {
     private func makeStore() -> ProfileStore {

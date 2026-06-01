@@ -1,4 +1,5 @@
 import Foundation
+import Core
 
 public enum PasswordlessHelper {
     public static let helperPath = "/usr/local/bin/gateway-switcher-helper"

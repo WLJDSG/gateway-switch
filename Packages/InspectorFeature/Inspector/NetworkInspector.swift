@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import Core
 
 public struct NetworkInspector: Sendable {
     private let runner: CommandRunning

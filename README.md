@@ -29,14 +29,6 @@ swift build
 
 脚本使用 SPM 构建后手动组装 .app bundle，包括嵌入 Widget Extension 和 App Group entitlements。
 
-## 在 Xcode 中开发
-
-```bash
-xed .
-```
-
-Xcode 会从 Package.swift 自动生成项目，无需 .xcodeproj 文件。
-
 ## 网关配置
 
 应用首次启动时自动创建 3 个默认 Profile：
@@ -75,23 +67,59 @@ helper 从白名单配置文件读取允许的路由器和 DNS IP，不再硬编
 ## 项目结构
 
 ```
-Package.swift              — SPM 项目定义（唯一入口）
-Sources/
-  GatewayKit/              — 网关切换核心逻辑库
-  SharedKit/               — GatewayProfile struct + ProfileStore 持久化
-  GatewaySwitcherApp/      — macOS App 入口 + SwiftUI 界面
-    Resources/             — Assets.xcassets（应用图标）
-  GatewaySwitcherWidget/   — WidgetKit 桌面小组件
-Tests/
-  GatewayKitTests/         — 单元测试（含 ProfileStore CRUD 测试）
-Config/
-  App/
-    Info.plist             — App Info.plist
-    GatewaySwitcher.entitlements — App Group entitlements
-  Widget/
-    Info.plist             — Widget Info.plist
-    GatewaySwitcherWidget.entitlements — Widget App Group entitlements
-script/
-  build_and_run.sh         — 构建 .app bundle 并运行
-  install_passwordless_helper.sh — 免密 helper 安装脚本
-  generate_app_icon.swift  — 图标生成工具
+GatewaySwitcher
+├── Package.swift              — SPM 项目定义（唯一入口）
+│
+├── GatewaySwitcherApp/        — macOS 主 App（MVVM）
+│   ├── App/                   — App 入口（Timer、Deep link 协调）
+│   ├── View/                  — SwiftUI 视图
+│   ├── ViewModel/             — AppViewModel + ProfileEditorViewModel
+│   └── Resources/             — Assets.xcassets
+│
+├── Packages/                  — Feature 模块（本地 SPM target）
+│   ├── Core/                  — 基础设施
+│   │   ├── Model/             — GatewayProfile, NetworkSnapshot, GatewayError
+│   │   ├── Store/             — ProfileStore（App Group 持久化）
+│   │   └── Runner/            — CommandRunning + ProcessCommandRunner
+│   ├── SwitcherFeature/       — 网关切换模块
+│   │   ├── Service/           — GatewayService（业务编排）
+│   │   └── Switcher/          — GatewaySwitcher（shell 命令执行）
+│   ├── InspectorFeature/      — 网络检测模块
+│   │   ├── Inspector/         — NetworkInspector
+│   │   └── Parser/            — RouteParser
+│   └── HelperFeature/         — 免密 Helper 模块
+│       └── Helper/             — PasswordlessHelper + HelperWhitelistUpdater
+│
+├── GatewaySwitcherWidget/     — WidgetKit 桌面小组件
+│
+├── Tests/                     — 按模块分组的单元测试
+│   ├── CoreTests/
+│   ├── InspectorFeatureTests/
+│   ├── SwitcherFeatureTests/
+│   └── AppTests/
+│
+├── Config/                    — 构建配置
+│   ├── App/                   — App entitlements + Info.plist
+│   └── Widget/                — Widget entitlements + Info.plist
+│
+└── script/                    — 构建与安装脚本
+    ├── build_and_run.sh       — 构建 .app bundle 并运行
+    └── install_passwordless_helper.sh — 免密 helper 安装脚本
+```
+
+### 依赖图
+
+```
+Core ← InspectorFeature ← SwitcherFeature ← GatewaySwitcherApp
+Core ← HelperFeature    ← SwitcherFeature
+Core ← GatewaySwitcherWidget
+```
+
+### 架构
+
+MVVM + Feature 模块化：
+
+- **View**：SwiftUI 视图，只做渲染和绑定
+- **ViewModel**：AppViewModel（主状态 + 业务调度）、ProfileEditorViewModel（表单逻辑）
+- **Service**：GatewayService 编排切换、检测、安装、白名单同步
+- **Model**：GatewayProfile、NetworkSnapshot、ProfileStore

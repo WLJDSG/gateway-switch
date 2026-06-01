@@ -1,8 +1,8 @@
 import SwiftUI
-import SharedKit
+import Core
 
 struct ProfileManagementView: View {
-    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var viewModel: AppViewModel
     @State private var editingProfile: GatewayProfile?
     @State private var isAddingNew = false
     @State private var showDeleteConfirmation: UUID?
@@ -20,12 +20,12 @@ struct ProfileManagementView: View {
                 }
             }
 
-            if appState.profiles.isEmpty {
+            if viewModel.profiles.isEmpty {
                 Text("暂无网关配置，点击「新增网关」添加。")
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, minHeight: 80)
             } else {
-                List(appState.profiles) { profile in
+                List(viewModel.profiles) { profile in
                     HStack(spacing: 12) {
                         Image(systemName: profile.symbolName)
                             .font(.title3)
@@ -41,7 +41,7 @@ struct ProfileManagementView: View {
 
                         Spacer()
 
-                        if appState.activeProfile?.id == profile.id {
+                        if viewModel.activeProfile?.id == profile.id {
                             Text("使用中")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(.green)
@@ -71,11 +71,11 @@ struct ProfileManagementView: View {
         .frame(minWidth: 500, minHeight: 400)
         .sheet(isPresented: $isAddingNew) {
             ProfileEditorView(isNew: true, profile: GatewayProfile(title: "", gateway: "", description: ""))
-                .environmentObject(appState)
+                .environmentObject(viewModel)
         }
         .sheet(item: $editingProfile) { profile in
             ProfileEditorView(isNew: false, profile: profile)
-                .environmentObject(appState)
+                .environmentObject(viewModel)
         }
         .alert("确认删除", isPresented: Binding(
             get: { showDeleteConfirmation != nil },
@@ -83,7 +83,7 @@ struct ProfileManagementView: View {
         )) {
             Button("删除", role: .destructive) {
                 if let id = showDeleteConfirmation {
-                    appState.deleteProfile(id: id)
+                    viewModel.deleteProfile(id: id)
                 }
                 showDeleteConfirmation = nil
             }

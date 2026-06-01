@@ -1,5 +1,5 @@
 import XCTest
-@testable import GatewayKit
+@testable import InspectorFeature
 
 final class RouteParserTests: XCTestCase {
     func testParseDefaultRouteFindsGatewayAndInterface() {

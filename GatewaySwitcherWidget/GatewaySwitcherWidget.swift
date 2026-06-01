@@ -1,6 +1,6 @@
 import SwiftUI
 import WidgetKit
-import SharedKit
+import Core
 
 struct GatewaySwitcherWidgetEntry: TimelineEntry {
     let date: Date

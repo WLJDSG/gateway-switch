@@ -1,6 +1,6 @@
 import XCTest
-@testable import GatewayKit
-import SharedKit
+@testable import Core
+import Core
 
 final class GatewayModelsTests: XCTestCase {
     func testDefaultProfilesIncludeThreePresets() {
