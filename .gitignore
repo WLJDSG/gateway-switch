@@ -1,8 +1,5 @@
 # IDE
-/.idea/workspace.xml
-/.idea/claudeCodeTabState.xml
-/.idea/CoolRequestSetting.xml
-/.idea/swift-toolchain.xml
+/.idea
 
 # macOS
 .DS_Store
