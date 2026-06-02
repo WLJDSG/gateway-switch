@@ -1,5 +1,6 @@
 # IDE
-/.idea
+/.idea/workspace.xml
+/.idea/claudeCodeTabState.xml
 
 # macOS
 .DS_Store
